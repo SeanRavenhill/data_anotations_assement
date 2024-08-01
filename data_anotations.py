@@ -43,7 +43,7 @@ def getGrid():
 
     # Check if data was successfully retrieved
     if not raw_data:
-        return
+        return 0, 0  # Return default values if no data is found
 
     # Initialize variables to track the maximum x and y coordinates
     x_range = 0
@@ -66,7 +66,6 @@ def getGrid():
         # Update y_range if the current y coordinate is greater
         y_range = max(y_range, y_coords)
 
-    # Print the maximum x and y coordinates found in the data
     return x_range, y_range
 
 
@@ -92,13 +91,15 @@ def sortArray():
             print(f"Error parsing row {row}: {e}")
             continue  # Skip to the next row
 
-        # Append the row to the list along with the extracted x and y coordinates
-        x_coord_sorted_array.append((x_coords, y_coords, row))
+        # Append the row to the list along with the extracted y and x coordinates
+        # Here, we swap y_coords and x_coords to prioritize sorting by y (vertical position)
+        # and then by x (horizontal position) if the y coordinates are equal.
+        x_coord_sorted_array.append((y_coords, x_coords, row))
 
-    # Sort the array first by x_coords and then by y_coords
+    # Sort the array first by y_coords and then by x_coords
     x_coord_sorted_array.sort(key=lambda item: (item[0], item[1]))
 
-    # Extract the sorted rows (discard x_coords and y_coords)
+    # Extract the sorted rows (discard y_coords and x_coords)
     sorted_rows = [item[2] for item in x_coord_sorted_array]
 
     return sorted_rows
@@ -106,37 +107,55 @@ def sortArray():
 
 def createsortedGrid(sorted_data, x_range, y_range):
     # Initialize a 2D list (grid) filled with an empty string space " "
-    grid = [[" " for _ in range(y_range + 1)] for _ in range(x_range + 1)]
+    grid = [[" " for _ in range(x_range + 1)] for _ in range(y_range + 1)]
 
-    # Populate the grid with the second item from each row or " " if no coords and symbol
+    # Populate the grid with the second item from each row
     for row in sorted_data:
         try:
             x_coords = int(row[0])
             y_coords = int(row[2])
-            second_item = row[1]
-            grid[x_coords][y_coords] = second_item
+
+            # Ensure coordinates are within grid bounds
+            if 0 <= x_coords <= x_range and 0 <= y_coords <= y_range:
+                second_item = row[1]
+                grid[y_coords][
+                    x_coords
+                ] = second_item  # Place the item at the correct coordinates
+            else:
+                print(f"Coordinates ({x_coords}, {y_coords}) are out of bounds.")
         except (ValueError, IndexError) as e:
             print(f"Error placing item from row {row} in grid: {e}")
 
     return grid
 
 
-def printGrid(sorted_grid, y_range):
+def printGrid(sorted_grid):
     strings_array = []
 
+    # Create string representations of each row in the grid
     for row in sorted_grid:
         string = ""
         for item in row:
             string += str(item)
-        string += "\n"
+        string += "\n"  # Add a newline character after each row
         strings_array.append(string)
 
+    # Reverse the array of row strings
+    # This is done to adjust the visual representation such that the first row
+    # of the data (which might be the "bottom" row in some visualizations) is printed last,
+    # aligning the visual output with the expected orientation where the "top" of the data
+    # corresponds to the beginning of the output.
+    strings_array.reverse()
+
+    # Print each row string
     for string in strings_array:
-        print(string, end="")
+        print(string, end="")  # Print without adding additional newlines
 
 
+# Fetch and process the data
 sorted_data = sortArray()
 x_range, y_range = getGrid()
 sorted_grid = createsortedGrid(sorted_data, x_range, y_range)
 
-printGrid(sorted_grid, y_range)
+# Print the final grid
+printGrid(sorted_grid)
