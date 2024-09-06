@@ -78,7 +78,7 @@ def sortArray():
         return []
 
     # Initialize an empty list to store sorted rows
-    x_coord_sorted_array = []
+    sorted_array = []
 
     # Iterate over each row in the data
     for row in raw_data:
@@ -94,15 +94,15 @@ def sortArray():
         # Append the row to the list along with the extracted y and x coordinates
         # Here, we swap y_coords and x_coords to prioritize sorting by y (vertical position)
         # and then by x (horizontal position) if the y coordinates are equal.
-        x_coord_sorted_array.append((y_coords, x_coords, row))
+        sorted_array.append((y_coords, x_coords, row))
 
     # Sort the array first by y_coords and then by x_coords
-    x_coord_sorted_array.sort(key=lambda item: (item[0], item[1]))
+    sorted_array.sort(key=lambda item: (item[0], item[1]))
 
     # Extract the sorted rows (discard y_coords and x_coords)
-    sorted_rows = [item[2] for item in x_coord_sorted_array]
+    sorted_array = [item[2] for item in sorted_array]
 
-    return sorted_rows
+    return sorted_array
 
 
 def createsortedGrid(sorted_data, x_range, y_range):
@@ -153,9 +153,8 @@ def printGrid(sorted_grid):
 
 
 # Fetch and process the data
-sorted_data = sortArray()
+sorted_array = sortArray()
 x_range, y_range = getGrid()
-sorted_grid = createsortedGrid(sorted_data, x_range, y_range)
+sorted_grid = createsortedGrid(sorted_array, x_range, y_range)
 
-# Print the final grid
 printGrid(sorted_grid)
